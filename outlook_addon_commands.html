@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MDaemon Bridge Commands</title>
+</head>
+<body>
+    <!-- Office.js Library -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+    
+    <script>
+        // Initialize Office.js
+        Office.onReady(() => {
+            console.log('MDaemon Bridge commands loaded');
+        });
+
+        // Function to handle ribbon button clicks
+        function showTaskPane(event) {
+            // This function would be called by ribbon buttons
+            // For now, it's a placeholder
+            console.log('Show task pane requested');
+            
+            // Complete the async operation
+            event.completed();
+        }
+
+        // Function to sync with MDaemon
+        function syncMDaemon(event) {
+            console.log('MDaemon sync requested');
+            
+            // This is where we'd trigger the sync operation
+            // For now, just log the request
+            
+            // Complete the async operation
+            event.completed();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDaemon Calendar Bridge</title>
+    
+    <!-- Office UI Fabric for consistent styling -->
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css">
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background-color: #faf9f8;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0078d4, #106ebe);
+            color: white;
+            padding: 16px;
+            margin: -16px -16px 16px -16px;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .connection-status {
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        
+        .status-connected {
+            background-color: #dff6dd;
+            color: #107c10;
+            border: 1px solid #92c5f7;
+        }
+        
+        .status-disconnected {
+            background-color: #fed9cc;
+            color: #d13438;
+            border: 1px solid #d13438;
+        }
+        
+        .server-config {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #323130;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d2d0ce;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 1px #0078d4;
+        }
+        
+        .btn {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .btn:hover {
+            background-color: #106ebe;
+        }
+        
+        .btn:disabled {
+            background-color: #a19f9d;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background-color: #f3f2f1;
+            color: #323130;
+            border: 1px solid #d2d0ce;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #edebe9;
+        }
+        
+        .task-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .task-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f2f1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+        }
+        
+        .task-info p {
+            margin: 0;
+            font-size: 12px;
+            color: #605e5c;
+        }
+        
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .task-actions button {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #605e5c;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #323130;
+            margin: 20px 0 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>MDaemon Calendar Bridge</h2>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status status-disconnected">
+        <span id="statusText">Not connected to MDaemon server</span>
+    </div>
+
+    <!-- Server Configuration -->
+    <div class="server-config">
+        <h3 class="section-title">MDaemon Server Settings</h3>
+        
+        <div class="form-group">
+            <label for="serverUrl">Server URL:</label>
+            <input type="text" id="serverUrl" placeholder="https://your-mdaemon-server.com" value="https://mail.yourcompany.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" placeholder="your.username@company.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Your password">
+        </div>
+        
+        <button class="btn" onclick="connectToMDaemon()">Connect to MDaemon</button>
+        <button class="btn btn-secondary" onclick="testConnection()">Test Connection</button>
+    </div>
+
+    <!-- Task Management -->
+    <div id="taskSection" style="display: none;">
+        <h3 class="section-title">Tasks & Calendar Events</h3>
+        
+        <div style="margin-bottom: 16px;">
+            <button class="btn" onclick="syncCalendar()">Sync Calendar</button>
+            <button class="btn btn-secondary" onclick="createTask()">New Task</button>
+        </div>
+        
+        <div class="task-list" id="taskList">
+            <div class="loading">
+                <p>No tasks loaded. Click "Sync Calendar" to fetch from MDaemon.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Office.js Library -->
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1.1/hosted/office.js"></script>
+    
+    <script>
+        // Initialize the add-in
+        Office.onReady((info) => {
+            if (info.host === Office.HostType.Outlook) {
+                console.log('MDaemon Bridge add-in loaded in Outlook');
+                loadSavedSettings();
+            }
+        });
+
+        // Global variables
+        let mdaemonConnection = null;
+        let tasks = [];
+
+        // Load saved server settings
+        function loadSavedSettings() {
+            const savedServer = localStorage.getItem('mdaemon_server');
+            const savedUsername = localStorage.getItem('mdaemon_username');
+            
+            if (savedServer) document.getElementById('serverUrl').value = savedServer;
+            if (savedUsername) document.getElementById('username').value = savedUsername;
+        }
+
+        // Save settings
+        function saveSettings() {
+            localStorage.setItem('mdaemon_server', document.getElementById('serverUrl').value);
+            localStorage.setItem('mdaemon_username', document.getElementById('username').value);
+        }
+
+        // Connect to MDaemon server
+        async function connectToMDaemon() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!serverUrl || !username || !password) {
+                alert('Please fill in all server connection fields');
+                return;
+            }
+
+            updateConnectionStatus('Connecting...', false);
+
+            try {
+                // This is where we'll implement the actual MDaemon connection
+                // For now, we'll simulate the connection
+                
+                saveSettings();
+                
+                // Simulate connection delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Simulate successful connection
+                mdaemonConnection = {
+                    server: serverUrl,
+                    username: username,
+                    connected: true
+                };
+
+                updateConnectionStatus('Connected to ' + serverUrl, true);
+                document.getElementById('taskSection').style.display = 'block';
+                
+                // Auto-sync on connection
+                syncCalendar();
+
+            } catch (error) {
+                console.error('Connection failed:', error);
+                updateConnectionStatus('Connection failed: ' + error.message, false);
+            }
+        }
+
+        // Test connection without saving
+        async function testConnection() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            
+            if (!serverUrl) {
+                alert('Please enter a server URL');
+                return;
+            }
+
+            updateConnectionStatus('Testing connection...', false);
+
+            try {
+                // Simple ping test - in real implementation, this would test MDaemon connectivity
+                const response = await fetch(serverUrl, { method: 'HEAD', mode: 'no-cors' });
+                updateConnectionStatus('Server reachable - ready to connect', false);
+            } catch (error) {
+                updateConnectionStatus('Server not reachable: ' + error.message, false);
+            }
+        }
+
+        // Update connection status UI
+        function updateConnectionStatus(message, connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('statusText');
+            
+            statusText.textContent = message;
+            
+            if (connected) {
+                statusElement.className = 'connection-status status-connected';
+            } else {
+                statusElement.className = 'connection-status status-disconnected';
+            }
+        }
+
+        // Sync calendar with MDaemon
+        async function syncCalendar() {
+            if (!mdaemonConnection || !mdaemonConnection.connected) {
+                alert('Please connect to MDaemon server first');
+                return;
+            }
+
+            const taskListElement = document.getElementById('taskList');
+            taskListElement.innerHTML = '<div class="loading">Syncing with MDaemon server...</div>';
+
+            try {
+                // This is where we'll implement the actual MDaemon sync
+                // For now, we'll simulate loading tasks
+                
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Simulate some tasks from MDaemon
+                tasks = [
+                    {
+                        id: 1,
+                        title: 'Review quarterly reports',
+                        dueDate: '2024-01-15',
+                        priority: 'High',
+                        completed: false
+                    },
+                    {
+                        id: 2,
+                        title: 'Team meeting preparation',
+                        dueDate: '2024-01-12',
+                        priority: 'Medium',
+                        completed: false
+                    },
+                    {
+                        id: 3,
+                        title: 'Update project documentation',
+                        dueDate: '2024-01-18',
+                        priority: 'Low',
+                        completed: true
+                    }
+                ];
+
+                displayTasks();
+
+            } catch (error) {
+                console.error('Sync failed:', error);
+                taskListElement.innerHTML = '<div class="loading">Sync failed: ' + error.message + '</div>';
+            }
+        }
+
+        // Display tasks in the UI
+        function displayTasks() {
+            const taskListElement = document.getElementById('taskList');
+            
+            if (tasks.length === 0) {
+                taskListElement.innerHTML = '<div class="loading">No tasks found on MDaemon server</div>';
+                return;
+            }
+
+            let taskHtml = '';
+            tasks.forEach(task => {
+                const statusClass = task.completed ? 'completed' : 'pending';
+                taskHtml += `
+                    <div class="task-item ${statusClass}">
+                        <div class="task-info">
+                            <h4>${task.title}</h4>
+                            <p>Due: ${task.dueDate} | Priority: ${task.priority}</p>
+                        </div>
+                        <div class="task-actions">
+                            ${!task.completed ? 
+                                `<button class="btn" onclick="completeTask(${task.id})">Complete</button>` : 
+                                '<span style="color: #107c10; font-weight: 500;">✓ Done</span>'
+                            }
+                            <button class="btn btn-secondary" onclick="addToOutlookCalendar(${task.id})">Add to Calendar</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            taskListElement.innerHTML = taskHtml;
+        }
+
+        // Create new task
+        function createTask() {
+            const title = prompt('Task title:');
+            const dueDate = prompt('Due date (YYYY-MM-DD):');
+            
+            if (title && dueDate) {
+                const newTask = {
+                    id: tasks.length + 1,
+                    title: title,
+                    dueDate: dueDate,
+                    priority: 'Medium',
+                    completed: false
+                };
+                
+                tasks.push(newTask);
+                displayTasks();
+                
+                // In real implementation, this would sync to MDaemon
+                console.log('Created task:', newTask);
+            }
+        }
+
+        // Mark task as complete
+        function completeTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = true;
+                displayTasks();
+                
+                // In real implementation, this would sync to MDaemon
+                console.log('Completed task:', task);
+            }
+        }
+
+        // Add task to Outlook calendar
+        function addToOutlookCalendar(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            // Use Office.js to create calendar appointment
+            Office.context.mailbox.displayNewAppointmentForm({
+                subject: task.title,
+                start: new Date(task.dueDate + 'T09:00:00'),
+                end: new Date(task.dueDate + 'T10:00:00'),
+                body: `Task from MDaemon server\nPriority: ${task.priority}`,
+                categories: ['MDaemon Task']
+            });
+        }
+    </script>
+</body>
+</html>
