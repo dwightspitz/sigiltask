@@ -12,9 +12,9 @@
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="MDaemon Calendar Bridge"/>
   <Description DefaultValue="Connect New Outlook to your on-premises MDaemon Exchange server"/>
-  <IconUrl DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://localhost:3000/assets/icon-80.png"/>
-  <SupportUrl DefaultValue="https://localhost:3000/support"/>
+  <IconUrl DefaultValue="https://yourusername.github.io/yourrepositoryname/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://yourusername.github.io/yourrepositoryname/assets/icon-80.png"/>
+  <SupportUrl DefaultValue="https://yourusername.github.io/yourrepositoryname/support"/>
 
   <!-- Hosts supported -->
   <Hosts>
@@ -32,7 +32,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://localhost:3000/taskpane.html"/>
+        <SourceLocation DefaultValue="https://yourusername.github.io/yourrepositoryname/taskpane.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -125,13 +125,13 @@
       <!-- Resources -->
       <Resources>
         <bt:Images>
-          <bt:Image id="Icon.16x16" DefaultValue="https://localhost:3000/assets/icon-16.png"/>
-          <bt:Image id="Icon.32x32" DefaultValue="https://localhost:3000/assets/icon-32.png"/>
-          <bt:Image id="Icon.80x80" DefaultValue="https://localhost:3000/assets/icon-80.png"/>
+          <bt:Image id="Icon.16x16" DefaultValue="https://yourusername.github.io/yourrepositoryname/assets/icon-16.png"/>
+          <bt:Image id="Icon.32x32" DefaultValue="https://yourusername.github.io/yourrepositoryname/assets/icon-32.png"/>
+          <bt:Image id="Icon.80x80" DefaultValue="https://yourusername.github.io/yourrepositoryname/assets/icon-80.png"/>
         </bt:Images>
         <bt:Urls>
-          <bt:Url id="Commands.Url" DefaultValue="https://localhost:3000/commands.html"/>
-          <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html"/>
+          <bt:Url id="Commands.Url" DefaultValue="https://yourusername.github.io/yourrepositoryname/commands.html"/>
+          <bt:Url id="Taskpane.Url" DefaultValue="https://yourusername.github.io/yourrepositoryname/taskpane.html"/>
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="GroupLabel" DefaultValue="MDaemon Bridge"/>
